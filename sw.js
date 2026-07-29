@@ -2,7 +2,7 @@
 // cuenta. Si uno falla (por ejemplo por un nombre mal escrito), los demás
 // se guardan igual, en vez de que todo el caché falle de golpe.
 
-const CACHE_NAME = 'ramo-de-rosas-v2';
+const CACHE_NAME = 'ramo-de-rosas-v4';
 const APP_SHELL = [
   './ramo-de-rosas.html',
   './manifest.json',

@@ -80,7 +80,41 @@ body{
 }
 .mute-btn.muted{ opacity:.5; }
 
-/* ---------- portada: toca para iniciar ---------- */
+.lyrics-btn{
+  right:56px;
+  font-family:var(--serif); font-size:13px; font-style:italic;
+}
+
+.lyrics-panel{
+  position:absolute; inset:0; z-index:8;
+  background:rgba(7,10,34,.94);
+  backdrop-filter:blur(8px);
+  display:none;
+  flex-direction:column;
+  padding:60px 22px 26px 22px;
+}
+.lyrics-panel.show{ display:flex; }
+.lyrics-close{
+  position:absolute; top:16px; right:16px;
+  background:none; border:none; color:var(--lavender); font-size:18px; cursor:pointer;
+}
+.lyrics-scroll{
+  flex:1; overflow-y:auto;
+  display:flex; flex-direction:column; gap:16px;
+  text-align:center;
+}
+.lyrics-line{
+  font-family:var(--serif); font-size:15px; color:rgba(233,232,255,.4);
+  transition: color .3s ease, transform .3s ease;
+  line-height:1.5;
+}
+.lyrics-line .en{ display:block; }
+.lyrics-line .es{ display:block; font-size:12px; font-style:italic; opacity:.8; margin-top:2px; }
+.lyrics-line.active{
+  color:var(--silver);
+  transform:scale(1.06);
+}
+.lyrics-line.active .en{ color:var(--rose-light); }
 .cover-screen{
   position:absolute; inset:0; z-index:6;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -249,6 +283,12 @@ body{
 
   <audio id="bgAudio" src="song.mp3" loop preload="auto"></audio>
   <button class="mute-btn" id="muteBtn">♪</button>
+  <button class="mute-btn lyrics-btn" id="lyricsBtn">Aa</button>
+
+  <div class="lyrics-panel" id="lyricsPanel">
+    <button class="lyrics-close" id="lyricsCloseBtn">✕</button>
+    <div class="lyrics-scroll" id="lyricsScroll"></div>
+  </div>
 
   <div class="cover-screen" id="coverScreen">
     <div class="countdown-view" id="countdownView">
@@ -370,6 +410,67 @@ const CONTENT = {
   // Fecha y hora exacta en que se desbloquea el regalo (formato ISO con offset de Colombia, UTC-5).
   fechaDesbloqueo: "2026-08-01T02:00:00-05:00",
 
+  // Letra sincronizada (opcional). Reemplaza estos marcadores con las líneas
+  // reales y el segundo exacto en que se cantan. "es" es la traducción y
+  // puede quedar vacío si todavía no la tienes.
+  // Yo no puedo escribir la letra real aquí (derechos de autor) — la pegas tú.
+  letra: [
+    { t: 00:02,  en: "[Butterflies]", es: "Mariposas" },
+    { t: 00:24,  en: "[All you got to do]", es: "Todo lo que tienes que hacer" },
+    { t: 00:27,  en: "[Is walk away and pass me by]", es: "Es alejarse y pasarme" },
+    { t: 00:34,  en: "[Don′t acknowledge my smile]", es: "No notar mi sonrisa" },
+    { t: 00:39.50, en: "[When I try to say hello to you, yeah]", es: "Cuando intento saludarte, sí" },
+    { t: 00:47,  en: "[And all you got to do]", es: "Y todo lo que tienes que hacer" },
+    { t: 00:50.80, en: "[Is not answer my calls when I'm trying to get through]", es: "No responder a mis llamadas cuando estoy tratando de pasar" },
+    { t: 00:57, en: "[Keep me wondering why]", es: "Mantenme preguntándome por qué" },
+    { t: 01:03, en: "[When all I can do is sigh]", es: "Cuando todo lo que puedo hacer es suspirar" },
+    { t: 01:08, en: "[I just wanna touch you]", es: "Solo quiero tocarte" },
+    { t: 01:10, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 01:15, en: "[And I wish that I could be with you tonight (you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 01:26, en: "[′Cause you give me butterflies]", es: "Me haces sentir mariposas" },
+    { t: 01:30, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },
+    { t: 01:34, en: "[All I got to say]", es: "Todo lo que tengo que decir" },
+    { t: 01:37, en: "[Is that I must be dreaming, can't be real]", es: "Es que debo estar soñando, no puede ser real" },
+    { t: 01:43, en: "[You're not here with me]", es: "No estás aquí conmigo" },
+    { t: 01:49, en: "[Still, I can feel ya near to me]", es: "Pero puedo sentirte cerca de mi" },
+    { t: 01:57, en: "[I caress you, let you taste us, just so blissful listen]", es: "Te acaricio, dejo que nos pruebe, simplemente tan maravilloso, escucha" },
+    { t: 02:07, en: "[I would give you anything, baby]", es: "Yo te daría todo, bebé" },
+    { t: 02:12.50, en: "[Just make my dreams come true]", es: "Solo haz mis sueños realidad" },
+    { t: 02:16, en: "[Oh, baby, you give me butterflies]", es: "Oh, nena me haces sentir mariposas" },
+    { t: 02:20, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 02:24.80, en: "[And I wish that I could be with you tonight (you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 02:35.50, en: "[′Cause you give me butterflies]", es: "Me haces sentir mariposas" },
+    { t: 02:40, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },
+    { t: 02:43, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 02:48, en: "[And I wish that I could be with you tonight (you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 02:58.80, en: "[′Cause you give me butterflies]", es: "Me haces sentir mariposas" },
+    { t: 03:03, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },    { t: 24, en: "[Línea 4]", es: "" },
+    { t: 03:07, en: "[If you would take my hand]", es: "Si tomaras mi mano" },
+    { t: 03:11, en: "[Baby, I would show you]", es: "Nena, yo te mostraría" },
+    { t: 03:14, en: "[Guide you to the light, babe]", es: "Guiarte a la luz, bebé" },
+    { t: 03:18.90, en: "[If you would be my love]", es: "Si tu fueras mi amor" },
+    { t: 03:22.70, en: "[Baby, I will love you, love you]", es: "Bebé, te amaría, amarte" },
+    { t: 03:27, en: "['Til the end of time]", es: "Haste el fin" },
+    { t: 03:30, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 03:34.50, en: "[And I wish that I could be with you tonight (girl, you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 03:45.50, en: "[You give me butterflies]", es: "Tu me haces sentir mariposas" },
+    { t: 03:49, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },
+    { t: 03:53, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 03:37.50, en: "[And I wish that I could be with you tonight (girl, you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 04:09, en: "[You give me butterflies]", es: "Tu me haces sentir mariposas" },
+    { t: 04:12.60, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },
+    { t: 04:16, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 04:21, en: "[And I wish that I could be with you tonight (girl, you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 04:31.50, en: "[You give me butterflies]", es: "Tu me haces sentir mariposas" },
+    { t: 04:36, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },
+    { t: 04:39.70, en: "[I just wanna touch and kiss]", es: "Solo quiero tocarte y besarte" },
+    { t: 04:44, en: "[And I wish that I could be with you tonight (girl, you give me)]", es: "Y desearía estar contigo está noche" },
+    { t: 04:55, en: "[You give me butterflies]", es: "Tu me haces sentir mariposas" },
+    { t: 04:59, en: "[Inside, inside and I]", es: "Por dentro, por dentro y yo" },
+
+    // agrega tantas líneas como necesites, con su segundo exacto "t"
+  ],
+
   // Segundo exacto de la canción donde debe empezar a sonar (0 = desde el inicio).
   audioStartSeconds: 0,
 
@@ -406,18 +507,19 @@ function spawnShootingStar(){
   el.style.height = '2px';
   el.style.left = (Math.random() * 55) + '%';
   el.style.top = (Math.random() * 28) + '%';
-  el.style.background = 'linear-gradient(90deg, rgba(255,255,255,.95), transparent)';
+  el.style.background = 'linear-gradient(90deg, transparent, rgba(255,255,255,.95))';
   el.style.borderRadius = '2px';
   el.style.filter = 'drop-shadow(0 0 4px rgba(255,255,255,.85))';
   el.style.transformOrigin = 'left center';
   el.style.pointerEvents = 'none';
   sky.appendChild(el);
 
+  const duration = 480 + Math.random()*220;
   const anim = el.animate([
     { transform: 'translate(0,0) rotate(' + angle + 'deg)', opacity: 0 },
     { transform: 'translate(' + (dx*0.15) + 'px,' + (dy*0.15) + 'px) rotate(' + angle + 'deg)', opacity: 1, offset: 0.15 },
     { transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(' + angle + 'deg)', opacity: 0 }
-  ], { duration: 900 + Math.random()*400, easing: 'linear' });
+  ], { duration: duration, easing: 'linear' });
   anim.onfinish = () => el.remove();
 }
 
@@ -427,15 +529,66 @@ function scheduleShootingStar(){
   setTimeout(() => {
     if (mainScreenActive){
       spawnShootingStar();
+      if (Math.random() < 0.3){
+        setTimeout(() => { if (mainScreenActive) spawnShootingStar(); }, 120 + Math.random()*180);
+      }
       scheduleShootingStar();
     }
   }, wait);
 }
 
-// ---- portada: toca para iniciar ----
+// ---- letra sincronizada ----
 const bgAudio = document.getElementById('bgAudio');
 const muteBtn = document.getElementById('muteBtn');
 let audioStarted = false;
+
+const lyricsScroll = document.getElementById('lyricsScroll');
+const lyricsPanel = document.getElementById('lyricsPanel');
+const lyricsBtn = document.getElementById('lyricsBtn');
+const lyricsCloseBtn = document.getElementById('lyricsCloseBtn');
+
+function buildLyrics(){
+  lyricsScroll.innerHTML = '';
+  CONTENT.letra.forEach((linea, i) => {
+    const div = document.createElement('div');
+    div.className = 'lyrics-line';
+    div.dataset.index = i;
+    const en = document.createElement('span');
+    en.className = 'en';
+    en.textContent = linea.en;
+    div.appendChild(en);
+    if (linea.es){
+      const es = document.createElement('span');
+      es.className = 'es';
+      es.textContent = '(' + linea.es + ')';
+      div.appendChild(es);
+    }
+    lyricsScroll.appendChild(div);
+  });
+}
+buildLyrics();
+
+bgAudio.addEventListener('timeupdate', () => {
+  if (!lyricsPanel.classList.contains('show')) return;
+  const t = bgAudio.currentTime;
+  let activeIndex = -1;
+  for (let i = 0; i < CONTENT.letra.length; i++){
+    if (t >= CONTENT.letra[i].t) activeIndex = i;
+  }
+  const lines = lyricsScroll.querySelectorAll('.lyrics-line');
+  lines.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+  if (activeIndex >= 0){
+    lines[activeIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+});
+
+lyricsBtn.addEventListener('click', () => {
+  if (!mainScreenActive) return;
+  lyricsPanel.classList.add('show');
+});
+lyricsCloseBtn.addEventListener('click', () => lyricsPanel.classList.remove('show'));
+
+// ---- portada: toca para iniciar ----
 
 let unlockTimer = null;
 function checkUnlock(){
@@ -525,15 +678,42 @@ function nextFrase(){
 let floatTimer = null;
 function showFloatingMessage(){
   const el = document.getElementById('floatingMsg');
+  const stage = document.getElementById('pressStage');
+  const roseHolder = document.querySelector('.rose-holder');
+  const hintSub = document.getElementById('hintSub');
+
+  const stageRect = stage.getBoundingClientRect();
+  const roseRect = roseHolder.getBoundingClientRect();
+  const hintRect = hintSub.getBoundingClientRect();
+
+  const edgeMargin = 46; // no pegado a los bordes de la pantalla
+  const gap = 14; // separación respecto al corazón / instrucciones
+
+  const topZoneStart = edgeMargin;
+  const topZoneEnd = (roseRect.top - stageRect.top) - gap;
+  const bottomZoneStart = (hintRect.bottom - stageRect.top) + gap;
+  const bottomZoneEnd = stageRect.height - edgeMargin;
+
+  const topZoneOk = (topZoneEnd - topZoneStart) > 20;
+  const bottomZoneOk = (bottomZoneEnd - bottomZoneStart) > 20;
+
+  let posPx;
+  if (topZoneOk && (!bottomZoneOk || Math.random() < 0.5)){
+    posPx = topZoneStart + Math.random() * (topZoneEnd - topZoneStart);
+  } else if (bottomZoneOk){
+    posPx = bottomZoneStart + Math.random() * (bottomZoneEnd - bottomZoneStart);
+  } else {
+    posPx = edgeMargin; // respaldo si la pantalla es muy chica
+  }
+
   const texto = nextFrase();
   el.textContent = texto;
-  const topPos = 20 + Math.random() * 18;
-  el.style.top = topPos + '%';
+  el.style.top = posPx + 'px';
   el.classList.remove('show');
   void el.offsetWidth; // reinicia la transición
   el.classList.add('show');
   clearTimeout(floatTimer);
-  floatTimer = setTimeout(() => el.classList.remove('show'), 1900);
+  floatTimer = setTimeout(() => el.classList.remove('show'), 2900);
 }
 
 // ---- mantener presionada la rosa ----
